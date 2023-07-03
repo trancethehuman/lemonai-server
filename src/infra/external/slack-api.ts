@@ -1,6 +1,9 @@
+/*
+Partly borrowed from https://github.com/n8n-io/n8n.
+*/
+
 import axios, { type AxiosRequestConfig } from 'axios';
 import { type SlackToolProps } from '../../domain/use-cases/execute-slack-operation';
-import type { IDataObject } from '../../services/workflow-interfaces';
 import { type ApiResponse, BaseExternalApi } from './base-external-api';
 
 interface IAttachment {
@@ -72,7 +75,7 @@ export class SlackApi extends BaseExternalApi<SlackToolProps> {
 
     const query = props.query ?? {};
 
-    const returnData: IDataObject[] = [];
+    const returnData: Array<Record<string, unknown>> = [];
     let responseData;
     let page = 1;
     // if the endpoint uses legacy pagination use count

@@ -1,3 +1,7 @@
+/*
+Partly borrowed from https://github.com/n8n-io/n8n.
+*/
+
 import {
   type ApiResponseData,
   type IExternalApi,
@@ -6,10 +10,9 @@ import {
   isApiErrorResponse,
   isRichApiErrorResponse,
 } from '../../services/identify-error-response';
-import { type IDataObject } from '../../services/workflow-interfaces';
 import { type SlackAuthType, type ToolType } from '../value-types/tool';
 import Result from '../value-types/transients/result';
-import type IUseCase from './IUseCase';
+import type IUseCase from './i-use-case';
 
 export interface SlackToolProps {
   propertyName: string;
@@ -536,7 +539,7 @@ export class ExecuteSlackOperation
 
     const { userGroupId, updateFields } = this.#params.userGroupUpdateParams;
 
-    const body: IDataObject = {
+    const body: Record<string, unknown> = {
       usergroup: userGroupId,
     };
 
@@ -585,7 +588,7 @@ export class ExecuteSlackOperation
 
     const { userGroupId, options } = this.#params.userGroupDisableParams;
 
-    const body: IDataObject = {
+    const body: Record<string, unknown> = {
       usergroup: userGroupId,
     };
 
@@ -610,7 +613,7 @@ export class ExecuteSlackOperation
 
     const { userGroupId, options } = this.#params.userGroupEnableParams;
 
-    const body: IDataObject = {
+    const body: Record<string, unknown> = {
       usergroup: userGroupId,
     };
 
@@ -635,7 +638,7 @@ export class ExecuteSlackOperation
 
     const { name, options } = this.#params.userGroupCreateParams;
 
-    const body: IDataObject = {
+    const body: Record<string, unknown> = {
       name,
     };
 
@@ -681,11 +684,13 @@ export class ExecuteSlackOperation
 
     const { options } = this.#params.userUpdateProfileParams;
 
-    const body: IDataObject = {};
+    const body: Record<string, unknown> = {};
     let status;
     if (options?.status) {
       status = (
-        (options.status as IDataObject)?.set_status as IDataObject[]
+        (options.status as Record<string, unknown>)?.set_status as Array<
+          Record<string, unknown>
+        >
       )[0];
       if (status.status_expiration === undefined) {
         status.status_expiration = 0;
@@ -699,10 +704,10 @@ export class ExecuteSlackOperation
       delete options.status;
     }
 
-    const fields: IDataObject = {};
+    const fields: Record<string, unknown> = {};
     if (options?.customFieldUi) {
-      const customFields = (options.customFieldUi as IDataObject)
-        .customFieldValues as IDataObject[];
+      const customFields = (options.customFieldUi as Record<string, unknown>)
+        .customFieldValues as Array<Record<string, unknown>>;
 
       for (const customField of customFields) {
         fields[customField.id as string] = {
@@ -879,7 +884,7 @@ export class ExecuteSlackOperation
 
     const { options } = this.#params.starDeleteParams;
 
-    const body: IDataObject = {};
+    const body: Record<string, unknown> = {};
     if (options?.channelId) {
       body.channel = options.channelId;
     }
@@ -913,7 +918,7 @@ export class ExecuteSlackOperation
     const { options, target, channelId, timestamp, fileId } =
       this.#params.starAddParams;
 
-    const body: IDataObject = { channel: channelId };
+    const body: Record<string, unknown> = { channel: channelId };
 
     if (target === 'message') {
       body.timestamp = timestamp?.toString();
@@ -968,7 +973,7 @@ export class ExecuteSlackOperation
 
     const { channelId, timestamp, name } = this.#params.reactionRemoveParams;
 
-    const body: IDataObject = {
+    const body: Record<string, unknown> = {
       channel: channelId,
       name,
       timestamp,
@@ -991,7 +996,7 @@ export class ExecuteSlackOperation
 
     const { channelId, timestamp, name } = this.#params.reactionAddParams;
 
-    const body: IDataObject = {
+    const body: Record<string, unknown> = {
       channel: channelId,
       name,
       timestamp,
@@ -1092,7 +1097,7 @@ export class ExecuteSlackOperation
       target = target.slice(0, 1) === '@' ? target : `@${target}`;
     }
 
-    const body: IDataObject = {
+    const body: Record<string, unknown> = {
       channel: target,
       ts: timestamp.toString(),
     };
@@ -1117,7 +1122,7 @@ export class ExecuteSlackOperation
     const { channelId, text, ts, updateFields } =
       this.#params.messageUpdateParams;
 
-    const body: IDataObject = {
+    const body: Record<string, unknown> = {
       channel: channelId,
       text,
       ts,
@@ -1165,7 +1170,7 @@ export class ExecuteSlackOperation
       target = target.slice(0, 1) === '@' ? target : `@${target}`;
     }
 
-    let content: IDataObject = {};
+    let content: Record<string, unknown> = {};
     switch (messageType) {
       case 'text':
         content = { text };
@@ -1182,7 +1187,7 @@ export class ExecuteSlackOperation
         };
         break;
     }
-    const body: IDataObject = {
+    const body: Record<string, unknown> = {
       channel: target,
       ...content,
     };
@@ -1214,15 +1219,18 @@ export class ExecuteSlackOperation
       }
     }
 
-    const replyValues = (otherOptions?.thread_ts as IDataObject)
-      ?.replyValues as IDataObject;
+    const replyValues = (otherOptions?.thread_ts as Record<string, unknown>)
+      ?.replyValues as Record<string, unknown>;
     Object.assign(body, replyValues);
     delete otherOptions?.thread_ts;
     delete otherOptions?.userEphemeral;
     delete otherOptions?.channelEphemeral;
     if (otherOptions?.botProfile) {
-      const botProfile = otherOptions.botProfile as IDataObject;
-      const botProfileValues = botProfile.imageValues as IDataObject;
+      const botProfile = otherOptions.botProfile as Record<string, unknown>;
+      const botProfileValues = botProfile.imageValues as Record<
+        string,
+        unknown
+      >;
       Object.assign(
         body,
         botProfileValues.profilePhotoType === 'image'
@@ -1260,7 +1268,7 @@ export class ExecuteSlackOperation
 
     const { channelId } = this.#params.channelUnarchiveParams;
 
-    const body: IDataObject = {
+    const body: Record<string, unknown> = {
       channel: channelId,
     };
 
@@ -1283,7 +1291,7 @@ export class ExecuteSlackOperation
 
     const { channelId, topic } = this.#params.channelSetTopicParams;
 
-    const body: IDataObject = {
+    const body: Record<string, unknown> = {
       channel: channelId,
       topic,
     };
@@ -1307,7 +1315,7 @@ export class ExecuteSlackOperation
 
     const { channelId, purpose } = this.#params.channelSetPurposeParams;
 
-    const body: IDataObject = {
+    const body: Record<string, unknown> = {
       channel: channelId,
       purpose,
     };
@@ -1374,7 +1382,7 @@ export class ExecuteSlackOperation
 
     const { channelId, name } = this.#params.channelRenameParams;
 
-    const body: IDataObject = {
+    const body: Record<string, unknown> = {
       channel: channelId,
       name,
     };
@@ -1396,7 +1404,7 @@ export class ExecuteSlackOperation
 
     const { options } = this.#params.channelOpenParams;
 
-    const body: IDataObject = {};
+    const body: Record<string, unknown> = {};
     if (options?.channelId) {
       body.channel = options.channelId;
     }
@@ -1451,7 +1459,7 @@ export class ExecuteSlackOperation
 
     if (resolveData) {
       if (!returnData) throw new Error('No data to resolve');
-      const data: IDataObject[] = [];
+      const data: Array<Record<string, unknown>> = [];
       for (const { member } of returnData) {
         const apiResponse = await this.#api.apiRequest(
           'GET',
@@ -1477,7 +1485,7 @@ export class ExecuteSlackOperation
 
     const { channelId } = this.#params.channelLeaveParams;
 
-    const body: IDataObject = {
+    const body: Record<string, unknown> = {
       channel: channelId,
     };
 
@@ -1499,7 +1507,7 @@ export class ExecuteSlackOperation
 
     const { channelId, userIds } = this.#params.channelInviteParams;
 
-    const body: IDataObject = {
+    const body: Record<string, unknown> = {
       channel: channelId,
       users: userIds,
     };
@@ -1604,7 +1612,7 @@ export class ExecuteSlackOperation
 
     const { channelId } = this.#params.channelJoinParams;
 
-    const body: IDataObject = {
+    const body: Record<string, unknown> = {
       channel: channelId,
     };
     const apiResponse = await this.#api.apiRequest(
@@ -1626,7 +1634,7 @@ export class ExecuteSlackOperation
 
     const { channelId, userId } = this.#params.channelKickParams;
 
-    const body: IDataObject = {
+    const body: Record<string, unknown> = {
       channel: channelId,
       user: userId,
     };
@@ -1649,7 +1657,7 @@ export class ExecuteSlackOperation
 
     const { channelId, channelVisibility } = this.#params.channelCreateParams;
 
-    const body: IDataObject = {
+    const body: Record<string, unknown> = {
       name: channelId[0] === '#' ? channelId.slice(1) : channelId,
       is_private: channelVisibility === 'private',
     };
@@ -1672,7 +1680,7 @@ export class ExecuteSlackOperation
 
     const { channelId } = this.#params.channelCloseParams;
 
-    const body: IDataObject = { channel: channelId };
+    const body: Record<string, unknown> = { channel: channelId };
     const apiResponse = await this.#api.apiRequest(
       'POST',
       'conversations.close',
@@ -1692,7 +1700,7 @@ export class ExecuteSlackOperation
 
     const { channelId } = this.#params.channelArchiveParams;
 
-    const body: IDataObject = { channel: channelId };
+    const body: Record<string, unknown> = { channel: channelId };
 
     const apiResponse = await this.#api.apiRequest(
       'POST',

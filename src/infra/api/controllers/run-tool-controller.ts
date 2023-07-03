@@ -7,7 +7,7 @@ import {
   isRichApiErrorResponse,
 } from '../../../services/identify-error-response';
 import type Result from '../../../domain/value-types/transients/result';
-import type IUseCase from '../../../domain/use-cases/IUseCase';
+import type IUseCase from '../../../domain/use-cases/i-use-case';
 import { type IExternalApi } from '../../../services/i-external-api';
 
 export default class RunToolController<

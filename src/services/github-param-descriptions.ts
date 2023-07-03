@@ -1,3 +1,7 @@
+/*
+Heavily borrowed from https://github.com/n8n-io/n8n.
+*/
+
 export default {
   baseParams: {
     authToken:

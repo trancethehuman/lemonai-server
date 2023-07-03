@@ -1,3 +1,7 @@
+/*
+Partly borrowed from https://github.com/n8n-io/n8n.
+*/
+
 import {
   type ApiResponseData,
   type IExternalApi,
@@ -6,10 +10,9 @@ import {
   isApiErrorResponse,
   isRichApiErrorResponse,
 } from '../../services/identify-error-response';
-import { type IDataObject } from '../../services/workflow-interfaces';
 import { type ToolType } from '../value-types/tool';
 import Result from '../value-types/transients/result';
-import type IUseCase from './IUseCase';
+import type IUseCase from './i-use-case';
 
 export interface ExecuteAirtableOperationReq {
   params: {
@@ -83,7 +86,7 @@ export class ExecuteAirtableOperation
     let endpoint = '';
     let requestMethod = '';
 
-    const body: IDataObject = {};
+    const body: Record<string, unknown> = {};
     const qs: Record<string, string | string[]> = {};
 
     if (operation === 'airtable-append-data') {
@@ -99,16 +102,16 @@ export class ExecuteAirtableOperation
       requestMethod = 'POST';
       endpoint = `${application}/${table}`;
 
-      const rows: IDataObject[] = [];
+      const rows: Array<Record<string, unknown>> = [];
 
       try {
         data.forEach((item) => {
-          const row: IDataObject = {};
+          const row: Record<string, unknown> = {};
 
           // Add only the specified fields
 
           if (fieldNamesToLoad) {
-            const rowFields: IDataObject = {};
+            const rowFields: Record<string, unknown> = {};
 
             for (const fieldName of fieldNamesToLoad) {
               if (fieldName in item) rowFields[fieldName] = item[fieldName];
@@ -276,14 +279,14 @@ export class ExecuteAirtableOperation
 
       requestMethod = 'PATCH';
 
-      const rows: IDataObject[] = [];
+      const rows: Array<Record<string, unknown>> = [];
 
       try {
         data.forEach((item) => {
-          const row: IDataObject = {};
+          const row: Record<string, unknown> = {};
 
           if (fieldNamesToUpdate.length) {
-            const rowFields: IDataObject = {};
+            const rowFields: Record<string, unknown> = {};
             for (const fieldName of fieldNamesToUpdate) {
               if (!(fieldName in item)) rowFields[fieldName] = item[fieldName];
             }

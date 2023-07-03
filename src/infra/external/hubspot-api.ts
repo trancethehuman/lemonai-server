@@ -1,6 +1,9 @@
+/*
+Partly borrowed from https://github.com/n8n-io/n8n.
+*/
+
 import axios, { type AxiosRequestConfig } from 'axios';
 import { type HubSpotToolProps } from '../../domain/use-cases/execute-hubspot-operation';
-import type { IDataObject } from '../../services/workflow-interfaces';
 import { type ApiResponse, BaseExternalApi } from './base-external-api';
 
 interface ReqConfig {
@@ -66,7 +69,7 @@ export class HubSpotApi extends BaseExternalApi<HubSpotToolProps> {
     query.count = '100';
     data.limit = data.limit || '100';
 
-    const returnData: IDataObject[] = [];
+    const returnData: Array<Record<string, unknown>> = [];
     let apiResponse: ApiResponse;
     do {
       apiResponse = await this.apiRequest(

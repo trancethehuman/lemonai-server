@@ -1,5 +1,8 @@
+/*
+Partly borrowed from https://github.com/n8n-io/n8n.
+*/
+
 import axios, { type AxiosRequestConfig } from 'axios';
-import type { IDataObject } from '../../services/workflow-interfaces';
 import {
   type ApiResponseData,
   BaseExternalApi,
@@ -64,7 +67,7 @@ export class HackernewsApi extends BaseExternalApi {
 
     props.data.hitsPerPage = 100;
 
-    const returnData: IDataObject[] = [];
+    const returnData: Array<Record<string, unknown>> = [];
 
     let responseData: ApiResponseData | undefined;
     let itemsReceived = 0;
@@ -79,7 +82,10 @@ export class HackernewsApi extends BaseExternalApi {
         )
       ).data;
       if (!responseData) throw new Error('No data returned');
-      returnData.push.apply(returnData, responseData.hits as IDataObject[]);
+      returnData.push.apply(
+        returnData,
+        responseData.hits as Array<Record<string, unknown>>
+      );
 
       if (returnData) {
         itemsReceived += returnData.length;

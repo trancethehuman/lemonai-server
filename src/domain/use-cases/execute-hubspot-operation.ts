@@ -1,12 +1,15 @@
+/*
+Partly borrowed from https://github.com/n8n-io/n8n.
+*/
+
 import { snakeCase } from 'change-case';
 import {
   isApiErrorResponse,
   isRichApiErrorResponse,
 } from '../../services/identify-error-response';
-import { type IDataObject } from '../../services/workflow-interfaces';
 import { type HubSpotAuthType, type ToolType } from '../value-types/tool';
 import Result from '../value-types/transients/result';
-import type IUseCase from './IUseCase';
+import type IUseCase from './i-use-case';
 import {
   type ApiResponseData,
   type IExternalApi,
@@ -704,7 +707,7 @@ export class ExecuteHubSpotOperation
 
     const { updateFields, ticketId } = this.#params.ticketUpdateParams;
 
-    const body: IDataObject[] = [];
+    const body: Array<Record<string, unknown>> = [];
     if (updateFields?.pipelineId) {
       body.push({
         name: 'hs_pipeline',
@@ -780,7 +783,7 @@ export class ExecuteHubSpotOperation
     );
 
     if (updateFields?.associatedCompanyIds) {
-      const companyAssociations: IDataObject[] = [];
+      const companyAssociations: Array<Record<string, unknown>> = [];
       for (const companyId of updateFields.associatedCompanyIds) {
         companyAssociations.push({
           fromObjectId: apiResponse.data?.objectId,
@@ -798,7 +801,7 @@ export class ExecuteHubSpotOperation
     }
 
     if (updateFields?.associatedContactIds) {
-      const contactAssociations: IDataObject[] = [];
+      const contactAssociations: Array<Record<string, unknown>> = [];
       for (const contactId of updateFields.associatedContactIds) {
         contactAssociations.push({
           fromObjectId: apiResponse.data?.objectId,
@@ -919,7 +922,7 @@ export class ExecuteHubSpotOperation
     const { additionalFields, pipelineId, stageId, ticketName } =
       this.#params.ticketCreateParams;
 
-    const body: IDataObject[] = [
+    const body: Array<Record<string, unknown>> = [
       {
         name: 'hs_pipeline',
         value: pipelineId,
@@ -990,7 +993,7 @@ export class ExecuteHubSpotOperation
     );
 
     if (additionalFields?.associatedCompanyIds) {
-      const companyAssociations: IDataObject[] = [];
+      const companyAssociations: Array<Record<string, unknown>> = [];
       for (const companyId of additionalFields.associatedCompanyIds) {
         companyAssociations.push({
           fromObjectId: apiResponse.data?.objectId,
@@ -1008,7 +1011,7 @@ export class ExecuteHubSpotOperation
     }
 
     if (additionalFields?.associatedContactIds) {
-      const contactAssociations: IDataObject[] = [];
+      const contactAssociations: Array<Record<string, unknown>> = [];
       for (const contactId of additionalFields.associatedContactIds) {
         contactAssociations.push({
           fromObjectId: apiResponse.data?.objectId,
@@ -1128,8 +1131,8 @@ export class ExecuteHubSpotOperation
 
     const body: {
       engagement: { type: string };
-      metadata: IDataObject;
-      associations: IDataObject;
+      metadata: Record<string, unknown>;
+      associations: Record<string, unknown>;
     } = {
       engagement: {
         type: type.toUpperCase(),
@@ -1179,7 +1182,7 @@ export class ExecuteHubSpotOperation
     const sortBy = additionalFields?.sortBy || 'createdate';
     const direction = additionalFields?.direction || 'DESCENDING';
 
-    const body: IDataObject = {
+    const body: Record<string, unknown> = {
       sorts: [
         {
           propertyName: sortBy,
@@ -1189,19 +1192,23 @@ export class ExecuteHubSpotOperation
     };
 
     if (filterGroupsUi?.filterGroupsValues) {
-      const filterGroupValues =
-        filterGroupsUi.filterGroupsValues as IDataObject[];
+      const filterGroupValues = filterGroupsUi.filterGroupsValues as Array<
+        Record<string, unknown>
+      >;
       body.filterGroups = [];
       for (const filterGroupValue of filterGroupValues) {
         if (filterGroupValue.filtersUi) {
-          const filterValues = (filterGroupValue.filtersUi as IDataObject)
-            .filterValues as IDataObject[];
+          const filterValues = (
+            filterGroupValue.filtersUi as Record<string, unknown>
+          ).filterValues as Array<Record<string, unknown>>;
           for (const filter of filterValues) {
             delete filter.type;
             // Hacky way to get the filter value as we concat the values with a | and the type
             filter.propertyName = filter.propertyName?.toString().split('|')[0];
           }
-          (body.filterGroups as IDataObject[]).push({ filters: filterValues });
+          (body.filterGroups as Array<Record<string, unknown>>).push({
+            filters: filterValues,
+          });
         }
       }
       if (Array.isArray(body.filterGroups) && body.filterGroups.length > 3) {
@@ -1312,7 +1319,7 @@ export class ExecuteHubSpotOperation
 
     if (filters?.propertiesCollection) {
       const propertiesValues = filters.propertiesCollection
-        .propertiesValues as IDataObject;
+        .propertiesValues as Record<string, unknown>;
       const properties = propertiesValues.properties as string | string[];
       qs.properties = !Array.isArray(propertiesValues.properties)
         ? (properties as string).split(',')
@@ -1360,7 +1367,7 @@ export class ExecuteHubSpotOperation
 
     if (filters?.propertiesCollection) {
       const propertiesValues = filters.propertiesCollection
-        .propertiesValues as IDataObject;
+        .propertiesValues as Record<string, unknown>;
       const properties = propertiesValues.properties as string | string[];
       qs.properties = !Array.isArray(propertiesValues.properties)
         ? (properties as string).split(',')
@@ -1389,7 +1396,7 @@ export class ExecuteHubSpotOperation
 
     const body: {
       associations?: Associations;
-      properties?: IDataObject[];
+      properties?: Array<Record<string, unknown>>;
     } = {};
     body.properties = [];
 
@@ -1436,8 +1443,9 @@ export class ExecuteHubSpotOperation
       });
     }
     if (updateFields?.customPropertiesUi) {
-      const customProperties = (updateFields.customPropertiesUi as IDataObject)
-        .customPropertiesValues as IDataObject[];
+      const customProperties = (
+        updateFields.customPropertiesUi as Record<string, unknown>
+      ).customPropertiesValues as Array<Record<string, unknown>>;
       if (customProperties) {
         for (const customProperty of customProperties) {
           body.properties.push({
@@ -1468,7 +1476,7 @@ export class ExecuteHubSpotOperation
 
     const body: {
       associations?: Associations;
-      properties?: IDataObject[];
+      properties?: Array<Record<string, unknown>>;
     } = {};
     body.properties = [];
     const associations: Associations = {};
@@ -1529,8 +1537,8 @@ export class ExecuteHubSpotOperation
     }
     if (additionalFields?.customPropertiesUi) {
       const customProperties = (
-        additionalFields.customPropertiesUi as IDataObject
-      ).customPropertiesValues as IDataObject[];
+        additionalFields.customPropertiesUi as Record<string, unknown>
+      ).customPropertiesValues as Array<Record<string, unknown>>;
       if (customProperties) {
         for (const customProperty of customProperties) {
           body.properties.push({
@@ -1589,7 +1597,7 @@ export class ExecuteHubSpotOperation
     } else if (domain.includes('http://')) {
       domain = domain.replace('http://', '');
     }
-    const body: IDataObject = {
+    const body: Record<string, unknown> = {
       requestOptions: {},
     };
     if (options?.properties) {
@@ -1636,7 +1644,7 @@ export class ExecuteHubSpotOperation
     }
     if (additionalFields?.propertiesCollection) {
       const propertiesValues = additionalFields.propertiesCollection
-        .propertiesValues as IDataObject;
+        .propertiesValues as Record<string, unknown>;
       const properties = propertiesValues.properties as string | string[];
       qs.properties = !Array.isArray(propertiesValues.properties)
         ? (properties as string).split(',')
@@ -1685,7 +1693,7 @@ export class ExecuteHubSpotOperation
     }
     if (options?.propertiesCollection) {
       const propertiesValues = options.propertiesCollection
-        .propertiesValues as IDataObject;
+        .propertiesValues as Record<string, unknown>;
       const properties = propertiesValues.properties as string | string[];
       qs.properties = !Array.isArray(propertiesValues.properties)
         ? (properties as string).split(',')
@@ -1749,7 +1757,7 @@ export class ExecuteHubSpotOperation
 
     const { companyId, updateFields } = this.#params.companyUpdateParams;
 
-    const body: IDataObject[] = [];
+    const body: Array<Record<string, unknown>> = [];
     if (updateFields?.name) {
       body.push({
         name: 'name',
@@ -1955,8 +1963,9 @@ export class ExecuteHubSpotOperation
       });
     }
     if (updateFields?.customPropertiesUi) {
-      const customProperties = (updateFields.customPropertiesUi as IDataObject)
-        .customPropertiesValues as IDataObject[];
+      const customProperties = (
+        updateFields.customPropertiesUi as Record<string, unknown>
+      ).customPropertiesValues as Array<Record<string, unknown>>;
 
       if (customProperties) {
         for (const customProperty of customProperties) {
@@ -1989,7 +1998,7 @@ export class ExecuteHubSpotOperation
 
     const { additionalFields, name } = this.#params.companyCreateParams;
 
-    const body: IDataObject[] = [];
+    const body: Array<Record<string, unknown>> = [];
     body.push({
       name: 'name',
       value: name,
@@ -2194,8 +2203,8 @@ export class ExecuteHubSpotOperation
     }
     if (additionalFields?.customPropertiesUi) {
       const customProperties = (
-        additionalFields.customPropertiesUi as IDataObject
-      ).customPropertiesValues as IDataObject[];
+        additionalFields.customPropertiesUi as Record<string, unknown>
+      ).customPropertiesValues as Array<Record<string, unknown>>;
 
       if (customProperties) {
         for (const customProperty of customProperties) {
@@ -2231,7 +2240,7 @@ export class ExecuteHubSpotOperation
     const sortBy = additionalFields?.sortBy || 'createdate';
     const direction = additionalFields?.direction || 'DESCENDING';
 
-    const body: IDataObject = {
+    const body: Record<string, unknown> = {
       sorts: [
         {
           propertyName: sortBy,
@@ -2241,19 +2250,23 @@ export class ExecuteHubSpotOperation
     };
 
     if (filterGroupsUi?.filterGroupsValues) {
-      const filterGroupValues =
-        filterGroupsUi.filterGroupsValues as IDataObject[];
+      const filterGroupValues = filterGroupsUi.filterGroupsValues as Array<
+        Record<string, unknown>
+      >;
       body.filterGroups = [];
       for (const filterGroupValue of filterGroupValues) {
         if (filterGroupValue.filtersUi) {
-          const filterValues = (filterGroupValue.filtersUi as IDataObject)
-            .filterValues as IDataObject[];
+          const filterValues = (
+            filterGroupValue.filtersUi as Record<string, unknown>
+          ).filterValues as Array<Record<string, unknown>>;
           for (const filter of filterValues) {
             delete filter.type;
             // Hacky way to get the filter value as we concat the values with a | and the type
             filter.propertyName = filter.propertyName?.toString().split('|')[0];
           }
-          (body.filterGroups as IDataObject[]).push({ filters: filterValues });
+          (body.filterGroups as Array<Record<string, unknown>>).push({
+            filters: filterValues,
+          });
         }
       }
       if (Array.isArray(body.filterGroups) && body.filterGroups.length > 3) {
@@ -2325,7 +2338,7 @@ export class ExecuteHubSpotOperation
     }
     if (additionalFields?.propertiesCollection) {
       const propertiesValues = additionalFields.propertiesCollection
-        .propertiesValues as IDataObject;
+        .propertiesValues as Record<string, unknown>;
       const properties = propertiesValues.properties as string | string[];
       qs.properties = !Array.isArray(propertiesValues.properties)
         ? (properties as string).split(',')
@@ -2377,7 +2390,7 @@ export class ExecuteHubSpotOperation
     }
     if (additionalFields?.propertiesCollection) {
       const propertiesValues = additionalFields.propertiesCollection
-        .propertiesValues as IDataObject;
+        .propertiesValues as Record<string, unknown>;
       const properties = propertiesValues.properties as string | string[];
       qs.properties = !Array.isArray(propertiesValues.properties)
         ? (properties as string).split(',')
@@ -2426,7 +2439,7 @@ export class ExecuteHubSpotOperation
     }
     if (additionalFields?.propertiesCollection) {
       const propertiesValues = additionalFields.propertiesCollection
-        .propertiesValues as IDataObject;
+        .propertiesValues as Record<string, unknown>;
       const properties = propertiesValues.properties as string | string[];
       qs.properties = !Array.isArray(propertiesValues.properties)
         ? (properties as string).split(',')
@@ -2454,7 +2467,7 @@ export class ExecuteHubSpotOperation
     const { email, additionalFields, options } =
       this.#params.contactUpsertParams;
 
-    const body: IDataObject[] = [];
+    const body: Array<Record<string, unknown>> = [];
     if (additionalFields?.annualRevenue) {
       body.push({
         property: 'annualrevenue',
@@ -2722,8 +2735,8 @@ export class ExecuteHubSpotOperation
 
     if (additionalFields?.customPropertiesUi) {
       const customProperties = (
-        additionalFields.customPropertiesUi as IDataObject
-      ).customPropertiesValues as IDataObject[];
+        additionalFields.customPropertiesUi as Record<string, unknown>
+      ).customPropertiesValues as Array<Record<string, unknown>>;
 
       if (customProperties) {
         for (const customProperty of customProperties) {
@@ -2746,7 +2759,7 @@ export class ExecuteHubSpotOperation
     );
 
     if (additionalFields?.associatedCompanyId) {
-      const companyAssociations: IDataObject[] = [];
+      const companyAssociations: Array<Record<string, unknown>> = [];
       companyAssociations.push({
         fromObjectId: apiResponse.data?.vid,
         toObjectId: additionalFields.associatedCompanyId,
@@ -4636,13 +4649,13 @@ export class ExecuteHubSpotOperation
     return result;
   };
 
-  #clean = (obj: any): IDataObject =>
-    Object.entries(obj).reduce((acc: IDataObject, [key, value]) => {
+  #clean = (obj: any): Record<string, unknown> =>
+    Object.entries(obj).reduce((acc: Record<string, unknown>, [key, value]) => {
       if (value) acc[key] = value;
       return acc;
     }, {});
 
-  #reduceMetadatFields = (data: string[]): IDataObject[] => {
+  #reduceMetadatFields = (data: string[]): Array<Record<string, unknown>> => {
     return data
       .reduce((a: string[], v) => {
         a.push(...v.split(','));
@@ -4651,7 +4664,7 @@ export class ExecuteHubSpotOperation
       .map((email) => ({ email }));
   };
 
-  #getEmailMetadata = (meta: IDataObject): IDataObject => {
+  #getEmailMetadata = (meta: Record<string, any>): Record<string, unknown> => {
     return {
       from: {
         ...(meta.fromEmail && { email: meta.fromEmail }),
@@ -4666,7 +4679,7 @@ export class ExecuteHubSpotOperation
     };
   };
 
-  #getTaskMetadata = (meta: IDataObject): IDataObject => {
+  #getTaskMetadata = (meta: Record<string, any>): Record<string, unknown> => {
     return {
       ...(meta.body && { body: meta.body }),
       ...(meta.subject && { subject: meta.subject }),
@@ -4675,7 +4688,9 @@ export class ExecuteHubSpotOperation
     };
   };
 
-  #getMeetingMetadata = (meta: IDataObject): IDataObject => {
+  #getMeetingMetadata = (
+    meta: Record<string, any>
+  ): Record<string, unknown> => {
     return {
       ...(meta.body && { body: meta.body }),
       ...(meta.startTime && {
@@ -4691,7 +4706,7 @@ export class ExecuteHubSpotOperation
     };
   };
 
-  #getCallMetadata = (meta: IDataObject): IDataObject => {
+  #getCallMetadata = (meta: Record<string, any>): Record<string, unknown> => {
     return {
       ...(meta.toNumber && { toNumber: meta.toNumber }),
       ...(meta.fromNumber && { fromNumber: meta.fromNumber }),
@@ -4710,7 +4725,7 @@ export class ExecuteHubSpotOperation
     ownerIds?: string;
     contactIds?: string;
     ticketIds?: string;
-  }): IDataObject => {
+  }): Record<string, unknown> => {
     return {
       ...(associations.companyIds && {
         companyIds: associations.companyIds.toString().split(','),

@@ -1,6 +1,6 @@
 import { type Tool, getTools } from '../value-types/tool';
 import Result from '../value-types/transients/result';
-import type IUseCase from './IUseCase';
+import type IUseCase from './i-use-case';
 
 export type GetToolsReq = undefined;
 

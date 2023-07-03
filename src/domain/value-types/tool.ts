@@ -1,3 +1,7 @@
+/*
+Partly borrowed from https://github.com/n8n-io/n8n.
+*/
+
 import githubParamDescriptions from '../../services/github-param-descriptions';
 import slackParamDescriptions from '../../services/slack-param-descriptions';
 

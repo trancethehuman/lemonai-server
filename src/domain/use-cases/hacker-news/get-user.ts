@@ -1,3 +1,7 @@
+/*
+Partly borrowed from https://github.com/n8n-io/n8n.
+*/
+
 import {
   type IExternalApi,
   type ApiResponse,
@@ -7,7 +11,7 @@ import {
   isRichApiErrorResponse,
 } from '../../../services/identify-error-response';
 import Result from '../../value-types/transients/result';
-import type IUseCase from '../IUseCase';
+import type IUseCase from '../i-use-case';
 
 export interface GetUserHackerNewsReq {
   params: {

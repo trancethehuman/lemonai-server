@@ -1,5 +1,8 @@
+/*
+Partly borrowed from https://github.com/n8n-io/n8n.
+*/
+
 import axios, { type AxiosRequestConfig } from 'axios';
-import type { IDataObject } from '../../services/workflow-interfaces';
 import { type ApiResponse, BaseExternalApi } from './base-external-api';
 
 export class GithubApi extends BaseExternalApi {
@@ -43,7 +46,7 @@ export class GithubApi extends BaseExternalApi {
     const query = props.query ?? {};
     const data = props.data ?? {};
 
-    const returnData: IDataObject[] = [];
+    const returnData: Array<Record<string, unknown>> = [];
 
     query.per_page = '100';
     let page = 1;
@@ -59,7 +62,7 @@ export class GithubApi extends BaseExternalApi {
         query
       );
       page++;
-      returnData.push(apiResponse.data as IDataObject);
+      returnData.push(apiResponse.data as Record<string, unknown>);
     } while (!apiResponse || apiResponse.headers.link?.includes('next'));
     return returnData;
   };

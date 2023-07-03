@@ -1,5 +1,8 @@
+/*
+Partly borrowed from https://github.com/n8n-io/n8n.
+*/
+
 import axios, { type AxiosRequestConfig } from 'axios';
-import type { IDataObject } from '../../services/workflow-interfaces';
 import { type ApiResponse, BaseExternalApi } from './base-external-api';
 
 interface IAttachment {
@@ -71,7 +74,7 @@ export class AirtableApi extends BaseExternalApi {
     const query = props.query ?? {};
     query.pageSize = '100';
 
-    const returnData: IDataObject[] = [];
+    const returnData: Array<Record<string, unknown>> = [];
 
     let responseData;
 

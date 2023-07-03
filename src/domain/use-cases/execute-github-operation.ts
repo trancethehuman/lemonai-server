@@ -1,11 +1,14 @@
+/*
+Partly borrowed from https://github.com/n8n-io/n8n.
+*/
+
 import {
   isApiErrorResponse,
   isRichApiErrorResponse,
 } from '../../services/identify-error-response';
-import { type IDataObject } from '../../services/workflow-interfaces';
 import { type GithubAuthType, type ToolType } from '../value-types/tool';
 import Result from '../value-types/transients/result';
-import type IUseCase from './IUseCase';
+import type IUseCase from './i-use-case';
 import {
   type ApiResponse,
   type ApiResponseData,
@@ -338,7 +341,7 @@ export class ExecuteGithubOperation
 
     const requestMethod = 'PUT';
 
-    const body: IDataObject = {};
+    const body: Record<string, unknown> = {};
     if (additionalParameters?.author) {
       body.author = additionalParameters.author;
     }
@@ -347,9 +350,11 @@ export class ExecuteGithubOperation
     }
     if (
       additionalParameters?.branch &&
-      (additionalParameters.branch as IDataObject).branch
+      (additionalParameters.branch as Record<string, unknown>).branch
     ) {
-      body.branch = (additionalParameters.branch as IDataObject).branch;
+      body.branch = (
+        additionalParameters.branch as Record<string, unknown>
+      ).branch;
     }
 
     body.message = commitMessage;
@@ -381,7 +386,7 @@ export class ExecuteGithubOperation
 
     const requestMethod = 'DELETE';
 
-    const body: IDataObject = {};
+    const body: Record<string, unknown> = {};
     if (additionalParameters?.author) {
       body.author = additionalParameters.author;
     }
@@ -390,9 +395,11 @@ export class ExecuteGithubOperation
     }
     if (
       additionalParameters?.branch &&
-      (additionalParameters.branch as IDataObject).branch
+      (additionalParameters.branch as Record<string, unknown>).branch
     ) {
-      body.branch = (additionalParameters.branch as IDataObject).branch;
+      body.branch = (
+        additionalParameters.branch as Record<string, unknown>
+      ).branch;
     }
 
     body.message = commitMessage;
@@ -427,7 +434,7 @@ export class ExecuteGithubOperation
 
     const requestMethod = 'PUT';
 
-    const body: IDataObject = {};
+    const body: Record<string, unknown> = {};
     if (additionalParameters?.author) {
       body.author = additionalParameters.author;
     }
@@ -436,9 +443,11 @@ export class ExecuteGithubOperation
     }
     if (
       additionalParameters?.branch &&
-      (additionalParameters.branch as IDataObject).branch
+      (additionalParameters.branch as Record<string, unknown>).branch
     ) {
-      body.branch = (additionalParameters.branch as IDataObject).branch;
+      body.branch = (
+        additionalParameters.branch as Record<string, unknown>
+      ).branch;
     }
 
     body.sha = await this.#getFileSha(
@@ -504,7 +513,7 @@ export class ExecuteGithubOperation
       this.#params.issueCreateParamType;
 
     const requestMethod = 'POST';
-    const data: IDataObject = {};
+    const data: Record<string, unknown> = {};
     data.title = title;
     data.body = body;
 
@@ -536,7 +545,7 @@ export class ExecuteGithubOperation
 
     const requestMethod = 'POST';
 
-    const data: IDataObject = { body };
+    const data: Record<string, unknown> = { body };
 
     const endpoint = `/repos/${this.#params.owner}/${
       this.#params.repository
@@ -562,12 +571,14 @@ export class ExecuteGithubOperation
 
     const requestMethod = 'PATCH';
 
-    const body: IDataObject = {};
+    const body: Record<string, unknown> = {};
     if (body.labels !== undefined) {
-      body.labels = (body.labels as IDataObject[]).map((data) => data.label);
+      body.labels = (body.labels as Array<Record<string, unknown>>).map(
+        (data) => data.label
+      );
     }
     if (body.assignees !== undefined) {
-      body.assignees = (body.assignees as IDataObject[]).map(
+      body.assignees = (body.assignees as Array<Record<string, unknown>>).map(
         (data) => data.assignee
       );
     }
@@ -912,7 +923,7 @@ export class ExecuteGithubOperation
 
     const requestMethod = 'POST';
 
-    const data: IDataObject | undefined = additionalFields;
+    const data: Record<string, unknown> | undefined = additionalFields;
 
     if (data) {
       data.event = event;
@@ -1124,7 +1135,7 @@ export class ExecuteGithubOperation
     if (!this.#auth) throw new Error('Auth missing');
     if (!this.#api) throw new Error('Api missing');
 
-    const getBody: IDataObject = {};
+    const getBody: Record<string, unknown> = {};
     if (branch !== undefined) {
       getBody.branch = branch;
     }
