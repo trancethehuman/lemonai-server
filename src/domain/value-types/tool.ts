@@ -4,6 +4,7 @@ Partly borrowed from https://github.com/n8n-io/n8n.
 
 import githubParamDescriptions from '../../services/github-param-descriptions';
 import slackParamDescriptions from '../../services/slack-param-descriptions';
+import notionParamDescriptions from '../../services/notion-param-descriptions';
 
 export const toolTypes = [
   'notion-append-after-block',
@@ -138,6 +139,7 @@ export type GithubAuthType = 'accessToken';
 export type HubSpotAuthType = 'accessToken';
 export type SlackAuthType = 'accessToken';
 export type AirtableAuthType = 'accessToken';
+export type NotionAuthType = 'apiKey';
 export type HackerNewsAuthType = 'none';
 
 interface ToolBase {
@@ -148,7 +150,8 @@ interface ToolBase {
     | HubSpotAuthType
     | SlackAuthType
     | AirtableAuthType
-    | HackerNewsAuthType;
+    | HackerNewsAuthType
+    | NotionAuthType;
 }
 export interface Tool extends ToolBase {
   description: string;
@@ -661,72 +664,114 @@ const toolBases: ToolBase[] = [
   {
     name: 'Notion: Append after block',
     id: 'notion-append-after-block',
-    params: [],
+    params: {
+      ...notionParamDescriptions.blockAppendParamDescriptions
+    },
+    authorizationType: 'apiKey'
   },
   {
     name: 'Notion: Get child blocks',
     id: 'notion-get-child-blocks',
-    params: [],
+    params: {
+      ...notionParamDescriptions.blockGetAllParamDescriptions
+    },
+    authorizationType: 'apiKey'
   },
   {
     name: 'Notion: Get database',
     id: 'notion-get-database',
-    params: [],
+    params: {
+      ...notionParamDescriptions.databaseGetParamDescriptions
+    },
+    authorizationType: 'apiKey'
   },
   {
     name: 'Notion: Get many database',
     id: 'notion-get-many-database',
-    params: [],
+    params: {
+      ...notionParamDescriptions.databaseGetAllParamDescriptions
+    },
+    authorizationType: 'apiKey'
   },
   {
     name: 'Notion: Search database',
     id: 'notion-search-database',
-    params: [],
+    params: {
+      ...notionParamDescriptions.databaseSearchParamDescriptions
+    },
+    authorizationType: 'apiKey'
   },
   {
     name: 'Notion: Create database page',
     id: 'notion-create-database-page',
-    params: [],
+    params: {
+      ...notionParamDescriptions.databasePageCreateParamDescriptions
+    },
+    authorizationType: 'apiKey'
   },
   {
     name: 'Notion: Get database page',
     id: 'notion-get-database-page',
-    params: [],
+    params: {
+      ...notionParamDescriptions.databasePageGetParamDescriptions
+    },
+    authorizationType: 'apiKey'
   },
   {
     name: 'Notion: Get many database page',
     id: 'notion-get-many-database-page',
-    params: [],
+    params: {
+      ...notionParamDescriptions.databasePageGetAllParamDescriptions
+    },
+    authorizationType: 'apiKey'
   },
   {
     name: 'Notion: Update database page',
     id: 'notion-update-database-page',
-    params: [],
+    params: {
+      ...notionParamDescriptions.databasePageUpdateParamDescriptions
+    },
+    authorizationType: 'apiKey'
   },
   {
     name: 'Notion: Archive page',
     id: 'notion-archive-page',
-    params: [],
+    params: {
+      ...notionParamDescriptions.pageArchiveParamDescriptions
+    },
+    authorizationType: 'apiKey'
   },
   {
     name: 'Notion: Create page',
     id: 'notion-create-page',
-    params: [],
+    params: {
+      ...notionParamDescriptions.pageCreateParamDescriptions
+    },
+    authorizationType: 'apiKey'
   },
   {
     name: 'Notion: Search page',
     id: 'notion-search-page',
-    params: [],
+    params: {
+      ...notionParamDescriptions.pageSearchParamDescriptions
+    },
+    authorizationType: 'apiKey'
   },
   {
     name: 'Notion: Get user',
     id: 'notion-get-user',
-    params: [],
+    params: {
+      ...notionParamDescriptions.userGetParamDescriptions
+    },
+    authorizationType: 'apiKey'
   },
   {
     name: 'Notion: Get many user',
     id: 'notion-get-many-user',
-    params: [],
+    params: {
+      ...notionParamDescriptions.userGetAllParamDescriptions
+    },
+    authorizationType: 'apiKey'
   },
 
   {
