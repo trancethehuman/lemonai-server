@@ -6,6 +6,20 @@ import githubParamDescriptions from '../../services/github-param-descriptions';
 import slackParamDescriptions from '../../services/slack-param-descriptions';
 
 export const toolTypes = [
+  'notion-append-after-block',
+  'notion-get-child-blocks',
+  'notion-get-database',
+  'notion-get-many-database',
+  'notion-search-database',
+  'notion-create-database-page',
+  'notion-get-database-page',
+  'notion-get-many-database-page',
+  'notion-update-database-page',
+  'notion-archive-page',
+  'notion-create-page',
+  'notion-search-page',
+  'notion-get-user',
+  'notion-get-many-user',
   'github-file-create',
   'github-file-delete',
   'github-file-edit',
@@ -644,6 +658,77 @@ const hubspotFormGetFieldsParams = {
 };
 
 const toolBases: ToolBase[] = [
+  {
+    name: 'Notion: Append after block',
+    id: 'notion-append-after-block',
+    params: [],
+  },
+  {
+    name: 'Notion: Get child blocks',
+    id: 'notion-get-child-blocks',
+    params: [],
+  },
+  {
+    name: 'Notion: Get database',
+    id: 'notion-get-database',
+    params: [],
+  },
+  {
+    name: 'Notion: Get many database',
+    id: 'notion-get-many-database',
+    params: [],
+  },
+  {
+    name: 'Notion: Search database',
+    id: 'notion-search-database',
+    params: [],
+  },
+  {
+    name: 'Notion: Create database page',
+    id: 'notion-create-database-page',
+    params: [],
+  },
+  {
+    name: 'Notion: Get database page',
+    id: 'notion-get-database-page',
+    params: [],
+  },
+  {
+    name: 'Notion: Get many database page',
+    id: 'notion-get-many-database-page',
+    params: [],
+  },
+  {
+    name: 'Notion: Update database page',
+    id: 'notion-update-database-page',
+    params: [],
+  },
+  {
+    name: 'Notion: Archive page',
+    id: 'notion-archive-page',
+    params: [],
+  },
+  {
+    name: 'Notion: Create page',
+    id: 'notion-create-page',
+    params: [],
+  },
+  {
+    name: 'Notion: Search page',
+    id: 'notion-search-page',
+    params: [],
+  },
+  {
+    name: 'Notion: Get user',
+    id: 'notion-get-user',
+    params: [],
+  },
+  {
+    name: 'Notion: Get many user',
+    id: 'notion-get-many-user',
+    params: [],
+  },
+
   {
     id: 'github-file-create',
     name: 'Github: Create a new file in repository',
