@@ -36,6 +36,8 @@ import {
   type ExecuteGithubOperationAuth,
 } from '../../../domain/use-cases/execute-github-operation';
 import { type GithubApi } from '../../external/github-api';
+import { type ExecuteNotionOperationAuth, type ExecuteNotionOperationReq, type ExecuteNotionOperationRes } from '../../../domain/use-cases/execute-notion-operation';
+import { type NotionApi } from '../../external/notion-api';
 
 type Controller =
   | RunToolController<GetArticleHackerNewsReq, GetArticleHackerNewsRes>
@@ -63,7 +65,12 @@ type Controller =
       ExecuteHubSpotOperationRes,
       ExecuteHubSpotOperationAuth,
       HubSpotApi
-    >;
+    >
+  | RunToolController<
+      ExecuteNotionOperationReq,
+      ExecuteNotionOperationRes,
+      ExecuteNotionOperationAuth,
+      NotionApi>;
 
 const buildAirtableAuth = (
   httpRequest: Request
@@ -90,6 +97,13 @@ const buildGithubAuth = (
   token: httpRequest.body.authToken,
   type: httpRequest.body.authType,
 });
+
+const buildNotionAuth = (
+  httpRequest: Request
+): ExecuteNotionOperationAuth => ({
+  token: httpRequest.body.authToken,
+  type: httpRequest.body.authType,
+})
 
 const getExecuteSlackOperationController = (
   buildReq: (httpRequest: Request) => ExecuteSlackOperationReq
@@ -135,6 +149,21 @@ const getExecuteGithubOperationController = (
     buildGithubAuth,
     app.resolve('githubApi')
   );
+
+  const getExecuteNotionOperationController = (
+    buildReq: (httpRequest: Request) => ExecuteNotionOperationReq
+  ): Controller =>
+    new RunToolController<
+      ExecuteNotionOperationReq,
+      ExecuteNotionOperationRes,
+      ExecuteNotionOperationAuth,
+      NotionApi
+    >(
+      buildReq,
+      app.resolve('executeNotionOperation'),
+      buildNotionAuth,
+      app.resolve('notionApi')
+    );
 
 const getExecuteAirtableOperationController = (
   buildReq: (httpRequest: Request) => ExecuteAirtableOperationReq
@@ -1392,6 +1421,194 @@ export default (toolId: string): Controller => {
       };
 
       return getExecuteGithubOperationController(buildReq);
+    }
+
+    case 'notion-append-after-block': {
+      const buildReq = (httpReq: Request): ExecuteNotionOperationReq => {
+
+        return {
+          params: {
+            toolType,
+            blockAppendParamTypes: httpReq.body,
+          },
+        };
+      };
+
+      return getExecuteNotionOperationController(buildReq);
+    }
+
+    case 'notion-get-child-blocks': {
+      const buildReq = (httpReq: Request): ExecuteNotionOperationReq => {
+
+        return {
+          params: {
+            toolType,
+            blockGetAllParamTypes: httpReq.body,
+          },
+        };
+      };
+
+      return getExecuteNotionOperationController(buildReq);
+    }
+
+    case 'notion-get-database': {
+      const buildReq = (httpReq: Request): ExecuteNotionOperationReq => {
+
+        return {
+          params: {
+            toolType,
+            databaseGetParamTypes: httpReq.body,
+          },
+        };
+      };
+
+      return getExecuteNotionOperationController(buildReq);
+    }
+
+    case 'notion-get-many-database': {
+      const buildReq = (httpReq: Request): ExecuteNotionOperationReq => {
+
+        return {
+          params: {
+            toolType,
+            databaseGetAllParamTypes: httpReq.body,
+          },
+        };
+      };
+
+      return getExecuteNotionOperationController(buildReq);
+    }
+
+    case 'notion-search-database': {
+      const buildReq = (httpReq: Request): ExecuteNotionOperationReq => {
+
+        return {
+          params: {
+            toolType,
+            databaseSearchParamTypes: httpReq.body,
+          },
+        };
+      };
+
+      return getExecuteNotionOperationController(buildReq);
+    }
+    case 'notion-create-database-page': {
+      const buildReq = (httpReq: Request): ExecuteNotionOperationReq => {
+
+        return {
+          params: {
+            toolType,
+            databasePageCreateParamTypes: httpReq.body,
+          },
+        };
+      };
+
+      return getExecuteNotionOperationController(buildReq);
+    }
+    case 'notion-get-database-page': {
+      const buildReq = (httpReq: Request): ExecuteNotionOperationReq => {
+
+        return {
+          params: {
+            toolType,
+            databasePageGetParamTypes: httpReq.body,
+          },
+        };
+      };
+
+      return getExecuteNotionOperationController(buildReq);
+    }
+    case 'notion-get-many-database-page': {
+      const buildReq = (httpReq: Request): ExecuteNotionOperationReq => {
+
+        return {
+          params: {
+            toolType,
+            databasePageGetAllParamTypes: httpReq.body,
+          },
+        };
+      };
+
+      return getExecuteNotionOperationController(buildReq);
+    }
+    case 'notion-update-database-page': {
+      const buildReq = (httpReq: Request): ExecuteNotionOperationReq => {
+
+        return {
+          params: {
+            toolType,
+            databasePageUpdateParamTypes: httpReq.body,
+          },
+        };
+      };
+
+      return getExecuteNotionOperationController(buildReq);
+    }
+    case 'notion-archive-page': {
+      const buildReq = (httpReq: Request): ExecuteNotionOperationReq => {
+
+        return {
+          params: {
+            toolType,
+            pageArchiveParamTypes: httpReq.body,
+          },
+        };
+      };
+
+      return getExecuteNotionOperationController(buildReq);
+    }
+    case 'notion-create-page': {
+      const buildReq = (httpReq: Request): ExecuteNotionOperationReq => {
+
+        return {
+          params: {
+            toolType,
+            pageCreateParamTypes: httpReq.body,
+          },
+        };
+      };
+
+      return getExecuteNotionOperationController(buildReq);
+    }
+    case 'notion-search-page': {
+      const buildReq = (httpReq: Request): ExecuteNotionOperationReq => {
+
+        return {
+          params: {
+            toolType,
+            pageSearchParamTypes: httpReq.body,
+          },
+        };
+      };
+
+      return getExecuteNotionOperationController(buildReq);
+    }
+    case 'notion-get-user': {
+      const buildReq = (httpReq: Request): ExecuteNotionOperationReq => {
+
+        return {
+          params: {
+            toolType,
+            userGetParamTypes: httpReq.body,
+          },
+        };
+      };
+
+      return getExecuteNotionOperationController(buildReq);
+    }
+
+    case 'notion-get-many-user': {
+      const buildReq = (httpReq: Request): ExecuteNotionOperationReq => {
+
+        return {
+          params: {
+            toolType,
+            userGetAllParamTypes: httpReq.body,
+          },
+        };
+      };
+
+      return getExecuteNotionOperationController(buildReq);
     }
 
     default:

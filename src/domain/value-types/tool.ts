@@ -4,8 +4,23 @@ Partly borrowed from https://github.com/n8n-io/n8n.
 
 import githubParamDescriptions from '../../services/github-param-descriptions';
 import slackParamDescriptions from '../../services/slack-param-descriptions';
+import notionParamDescriptions from '../../services/notion-param-descriptions';
 
 export const toolTypes = [
+  'notion-append-after-block',
+  'notion-get-child-blocks',
+  'notion-get-database',
+  'notion-get-many-database',
+  'notion-search-database',
+  'notion-create-database-page',
+  'notion-get-database-page',
+  'notion-get-many-database-page',
+  'notion-update-database-page',
+  'notion-archive-page',
+  'notion-create-page',
+  'notion-search-page',
+  'notion-get-user',
+  'notion-get-many-user',
   'github-file-create',
   'github-file-delete',
   'github-file-edit',
@@ -124,6 +139,7 @@ export type GithubAuthType = 'accessToken';
 export type HubSpotAuthType = 'accessToken';
 export type SlackAuthType = 'accessToken';
 export type AirtableAuthType = 'accessToken';
+export type NotionAuthType = 'apiKey';
 export type HackerNewsAuthType = 'none';
 
 interface ToolBase {
@@ -134,7 +150,8 @@ interface ToolBase {
     | HubSpotAuthType
     | SlackAuthType
     | AirtableAuthType
-    | HackerNewsAuthType;
+    | HackerNewsAuthType
+    | NotionAuthType;
 }
 export interface Tool extends ToolBase {
   description: string;
@@ -644,6 +661,119 @@ const hubspotFormGetFieldsParams = {
 };
 
 const toolBases: ToolBase[] = [
+  {
+    name: 'Notion: Append after block',
+    id: 'notion-append-after-block',
+    params: {
+      ...notionParamDescriptions.blockAppendParamDescriptions
+    },
+    authorizationType: 'apiKey'
+  },
+  {
+    name: 'Notion: Get child blocks',
+    id: 'notion-get-child-blocks',
+    params: {
+      ...notionParamDescriptions.blockGetAllParamDescriptions
+    },
+    authorizationType: 'apiKey'
+  },
+  {
+    name: 'Notion: Get database',
+    id: 'notion-get-database',
+    params: {
+      ...notionParamDescriptions.databaseGetParamDescriptions
+    },
+    authorizationType: 'apiKey'
+  },
+  {
+    name: 'Notion: Get many database',
+    id: 'notion-get-many-database',
+    params: {
+      ...notionParamDescriptions.databaseGetAllParamDescriptions
+    },
+    authorizationType: 'apiKey'
+  },
+  {
+    name: 'Notion: Search database',
+    id: 'notion-search-database',
+    params: {
+      ...notionParamDescriptions.databaseSearchParamDescriptions
+    },
+    authorizationType: 'apiKey'
+  },
+  {
+    name: 'Notion: Create database page',
+    id: 'notion-create-database-page',
+    params: {
+      ...notionParamDescriptions.databasePageCreateParamDescriptions
+    },
+    authorizationType: 'apiKey'
+  },
+  {
+    name: 'Notion: Get database page',
+    id: 'notion-get-database-page',
+    params: {
+      ...notionParamDescriptions.databasePageGetParamDescriptions
+    },
+    authorizationType: 'apiKey'
+  },
+  {
+    name: 'Notion: Get many database page',
+    id: 'notion-get-many-database-page',
+    params: {
+      ...notionParamDescriptions.databasePageGetAllParamDescriptions
+    },
+    authorizationType: 'apiKey'
+  },
+  {
+    name: 'Notion: Update database page',
+    id: 'notion-update-database-page',
+    params: {
+      ...notionParamDescriptions.databasePageUpdateParamDescriptions
+    },
+    authorizationType: 'apiKey'
+  },
+  {
+    name: 'Notion: Archive page',
+    id: 'notion-archive-page',
+    params: {
+      ...notionParamDescriptions.pageArchiveParamDescriptions
+    },
+    authorizationType: 'apiKey'
+  },
+  {
+    name: 'Notion: Create page',
+    id: 'notion-create-page',
+    params: {
+      ...notionParamDescriptions.pageCreateParamDescriptions
+    },
+    authorizationType: 'apiKey'
+  },
+  {
+    name: 'Notion: Search page',
+    id: 'notion-search-page',
+    params: {
+      ...notionParamDescriptions.pageSearchParamDescriptions
+    },
+    authorizationType: 'apiKey'
+  },
+  {
+    name: 'Notion: Get user',
+    id: 'notion-get-user',
+    params: {
+      ...notionParamDescriptions.userGetParamDescriptions
+    },
+    authorizationType: 'apiKey'
+  },
+  {
+    name: 'Notion: Get many user',
+    id: 'notion-get-many-user',
+    params: {
+      ...notionParamDescriptions.userGetAllParamDescriptions
+    },
+    authorizationType: 'apiKey'
+  },
+
   {
     id: 'github-file-create',
     name: 'Github: Create a new file in repository',

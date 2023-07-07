@@ -11,6 +11,8 @@ import { HubSpotApi } from './infra/external/hubspot-api';
 import { HackernewsApi } from './infra/external/hacker-news-api';
 import { GithubApi } from './infra/external/github-api';
 import { ExecuteGithubOperation } from './domain/use-cases/execute-github-operation';
+import { ExecuteNotionOperation } from './domain/use-cases/execute-notion-operation';
+import { NotionApi } from './infra/external/notion-api';
 
 const iocContainer = createContainer({ injectionMode: InjectionMode.CLASSIC });
 
@@ -23,12 +25,14 @@ iocContainer.register({
   executeSlackOperation: asClass(ExecuteSlackOperation),
   executeGithubOperation: asClass(ExecuteGithubOperation),
   executeHubSpotOperation: asClass(ExecuteHubSpotOperation),
+  executeNotionOperation: asClass(ExecuteNotionOperation),
 
   slackApi: asClass(SlackApi),
   airtableApi: asClass(AirtableApi),
   hubSpotApi: asClass(HubSpotApi),
   hackernewsApi: asClass(HackernewsApi),
   githubApi: asClass(GithubApi),
+  notionApi: asClass(NotionApi),
 });
 
 export default iocContainer;
