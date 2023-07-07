@@ -619,16 +619,6 @@ interface SortData {
 };
 
 interface FileRecord {
-  // properties: {
-  //   [key: string]:
-  //     | any
-  //     | {
-  //         id: string;
-  //         type: string;
-  //         files: [{ external: { url: string } } | { file: { url: string } }];
-  //       };
-  // };
-
   properties: Record<string, any>;
 };
 
@@ -1080,7 +1070,6 @@ export class ExecuteNotionOperation
       filterType,
       matchType,
       filters,
-      // jsonNotice,
       filterJson,
       options,
     } = this.#params.databasePageGetAllParamTypes;
@@ -1404,8 +1393,8 @@ export class ExecuteNotionOperation
       return responseData;
     };
 
-    // prettier-ignore
-   #downloadFiles = async (records: FileRecord[]): Promise<Array<Record<string, unknown>>> => {
+  // prettier-ignore
+  #downloadFiles = async (records: FileRecord[]): Promise<Array<Record<string, unknown>>> => {
     if (!this.#auth) throw new Error('Auth missing');
     if (!this.#api) throw new Error('Api missing');
 
@@ -1569,7 +1558,6 @@ export class ExecuteNotionOperation
       #getPropertyKeyValue(
         value: any,
         type: string,
-        // timezone: string,
         version = 1
       ): Record<string, unknown> {
         const ignoreIfEmpty = <T>(v: T, cb: (v: T) => any): any =>
@@ -1634,7 +1622,6 @@ export class ExecuteNotionOperation
             };
             break;
           case 'people':
-            //  if expression it's a single value, make it an array
             if (!Array.isArray(value.peopleValue)) {
               value.peopleValue = [value.peopleValue];
             }
@@ -1684,7 +1671,6 @@ export class ExecuteNotionOperation
                 };
               }
       
-            // if the date was left empty, set it to null so it resets the value in notion
             if (
               value.date === '' ||
               (value.dateStart === '' && value.dateEnd === '')
@@ -2026,11 +2012,7 @@ export class ExecuteNotionOperation
         }
         return result;
       }
-      
-      /**
-       * Manually extract a richtext's database mention RLC parameter.
-       * @param blockValues the blockUi.blockValues node parameter.
-       */
+
       #extractDatabaseMentionRLC(blockValues: Record<string, unknown>): void {
           if (blockValues.richText && blockValues.text) {
             const texts = (
