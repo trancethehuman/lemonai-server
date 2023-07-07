@@ -49,22 +49,33 @@ export class NotionApi extends BaseExternalApi {
 
     const returnData: Array<Record<string, unknown>> = [];
 
-    query.per_page = '100';
-    let page = 1;
-
     let apiResponse: ApiResponse;
+    const resource = endpoint.replace("/", "");
+
     do {
-      query.page = page.toString();
       apiResponse = await this.apiRequest(
-        method,
+        method, 
         endpoint,
-        authToken,
-        data,
+        authToken, 
+        data, 
         query
       );
-      page++;
-      returnData.push(apiResponse.data as Record<string, unknown>);
-    } while (!apiResponse || apiResponse.headers.link?.includes('next'));
+
+      if (apiResponse.data) {
+        const { next_cursor: nextCursor } = apiResponse.data;
+        if (resource === 'block' || resource === 'user') {
+          query.start_cursor = nextCursor;
+        } else {
+          data.start_cursor = nextCursor;
+        }
+        returnData.push(apiResponse.data);
+        const limit = Number(query.limit);
+        if (limit && limit <= returnData.length) {
+          return returnData;
+        }
+      }
+    } while (apiResponse.data?.has_more !== false);
+
     return returnData;
   };
 }

@@ -10,7 +10,6 @@ import { type NotionAuthType, type ToolType } from '../value-types/tool';
 import Result from '../value-types/transients/result';
 import type IUseCase from './i-use-case';
 import {
-  type ApiResponse,
   type ApiResponseData,
   type IExternalApi,
 } from '../../services/i-external-api';
@@ -754,9 +753,7 @@ export class ExecuteNotionOperation
       const { blockId, blockUi } =
         this.#params.blockAppendParamTypes;
 
-      const pageId = this.#extractPageId(
-          blockId
-      );
+      const pageId = this.#extractPageId(blockId);
 
       let body: Record<string, unknown> = {};
       
@@ -785,17 +782,27 @@ export class ExecuteNotionOperation
 
     const { blockId, returnAll, limit } =
       this.#params.blockGetAllParamTypes;
+    
+    const extractedBlockId = this.#extractPageId(blockId);
 
-    let apiResponse: ApiResponse;
+    let apiResponse;
+    let responseData;
     const query: Record<string, string | string[]> = {};
 
     if (returnAll) {
-      apiResponse = await this.#api.apiRequest(
-        'results',
-        'GET',
-        `/blocks/${blockId}/children`,
-        {},
-      );
+      apiResponse = await this.#api.apiRequestAllItems({
+        method: 'GET',
+        endpoint: `/blocks/${extractedBlockId}/children`,
+        authToken: this.#auth.token,
+        data: {},
+      });
+
+      const flattenedResponseList: any = [];
+      apiResponse.forEach((p: any) => {
+        p.results.forEach((e: any) => flattenedResponseList.push(e))
+      });
+
+      responseData = flattenedResponseList;
     } else {
       if (limit)
         query.page_size = limit.toString();
@@ -806,9 +813,11 @@ export class ExecuteNotionOperation
         {},
         query,
       );
+
+      responseData = apiResponse.data;
     }
 
-    return apiResponse.data;
+    return responseData;
   };
 
   #execDatabaseGet = async (): Promise<ApiResponseData | undefined> => {
@@ -822,7 +831,11 @@ export class ExecuteNotionOperation
 
     const extractedDatabaseId = this.#extractDatabaseId(databaseId);
     
-    const apiResponse = await this.#api.apiRequest('GET', `/databases/${extractedDatabaseId}`);
+    const apiResponse = await this.#api.apiRequest(
+      'GET', 
+      `/databases/${extractedDatabaseId}`,
+      this.#auth.token
+      );
     let responseData: ApiResponseData | undefined;
 
     if (simple) {
@@ -843,11 +856,12 @@ export class ExecuteNotionOperation
     const { simple, returnAll, limit } =
       this.#params.databaseGetAllParamTypes;
     
-    const body: Record<string, unknown> = {
+    const body: Record<string, any> = {
       filter: { property: 'object', value: 'database' },
     };
 
-    let apiResponse: ApiResponse;
+    let apiResponse;
+    let responseData: ApiResponseData | undefined;
     
     if (returnAll) {
       apiResponse = await this.#api.apiRequestAllItems({
@@ -856,6 +870,15 @@ export class ExecuteNotionOperation
         authToken: this.#auth.token,
         data: body
       });
+
+      if (simple) {
+        const flattenedResponseList: any = [];
+        apiResponse.forEach((p: any) => {
+          p.results.forEach((e: any) => flattenedResponseList.push(e))
+        })
+
+        responseData = this.#simplifyObjects(flattenedResponseList);
+      }
     } else {
       body.page_size = limit;
       apiResponse = await this.#api.apiRequest(
@@ -864,11 +887,10 @@ export class ExecuteNotionOperation
         this.#auth.token, 
         body
       );
-    }
-    
-    let responseData = apiResponse.data;
-    if (simple) {
-      responseData = this.#simplifyObjects(responseData);
+
+      if (simple) {
+        responseData = this.#simplifyObjects(apiResponse.data);
+      }
     }
 
     return responseData;
@@ -890,9 +912,10 @@ export class ExecuteNotionOperation
         },
       };
 
-      let apiResponse: ApiResponse;
-      let responseData: ApiResponseData | undefined;
+      let apiResponse;
+      let responseData;
       const query: Record<string, string | string[]> = {};
+      const flattenedResponseList: any = [];
 
       if (text) {
         body.query = text;
@@ -909,7 +932,11 @@ export class ExecuteNotionOperation
           data: body,
         });
 
-        responseData = apiResponse.data;
+        apiResponse.forEach((p: any) => {
+          p.results.forEach((e: any) => flattenedResponseList.push(e))
+        });
+
+        responseData = flattenedResponseList;
       } else {
         if (limit)
           query.limit = limit.toString();
@@ -920,7 +947,11 @@ export class ExecuteNotionOperation
           data: body,
         });
 
-        responseData = apiResponse.data?.splice(0, query.limit);
+        apiResponse.forEach((p: any) => {
+          p.results.forEach((e: any) => flattenedResponseList.push(e))
+        });
+
+        responseData = flattenedResponseList.splice(0, query.limit);
       }
 
       if (simple) {
@@ -1020,7 +1051,8 @@ export class ExecuteNotionOperation
 
     const apiResponse = await this.#api.apiRequest(
       'GET', 
-      `/pages/${extractedPageId}`
+      `/pages/${extractedPageId}`,
+      this.#auth.token
     );
 
     let responseData: ApiResponseData | undefined;
@@ -1085,18 +1117,28 @@ export class ExecuteNotionOperation
       body.sorts = this.#mapSorting(sort as SortData[]);
     }
 
-    let apiResponse: ApiResponse;
-    let responseData: ApiResponseData | undefined;
+    let apiResponse;
+    let responseData;
 
     if (returnAll) {
       apiResponse = await this.#api.apiRequestAllItems({
         method: 'POST',
         endpoint: `/databases/${databaseId}/query`,
+        authToken: this.#auth.token,
         data: body,
         query: {},
       });
 
-      responseData = apiResponse.data;
+      const flattenedResponseList: any = [];
+      apiResponse.forEach((p: any) => {
+        p.results.forEach((e: any) => flattenedResponseList.push(e))
+      });
+
+      responseData = flattenedResponseList;
+
+      if (simple) {
+        responseData = this.#simplifyObjects(responseData, download);
+      }
     } else {
       body.page_size = limit;
       apiResponse = await this.#api.apiRequest(
@@ -1107,12 +1149,13 @@ export class ExecuteNotionOperation
         {},
       );
       responseData = apiResponse.data;
+
+      if (simple) {
+        responseData = this.#simplifyObjects(responseData, download);
+      }
     }
     if (download) {
       responseData = await this.#downloadFiles(responseData as FileRecord[]);
-    }
-    if (simple) {
-      responseData = this.#simplifyObjects(responseData, download);
     }
 
     return responseData;
@@ -1188,17 +1231,17 @@ export class ExecuteNotionOperation
 
     const { returnAll, limit } = this.#params.userGetAllParamTypes;
 
-    let apiResponse: ApiResponse;
-    let responseData: ApiResponseData | undefined;
+    let apiResponse;
+    let responseData;
 
     if (returnAll) {
-      apiResponse = await this.#api.apiRequest(
-        'GET', 
-        '/users',
-        this.#auth.token
-      );
+      apiResponse = await this.#api.apiRequestAllItems({
+        method: 'GET', 
+        endpoint: '/users',
+        authToken: this.#auth.token
+      });
 
-      responseData = apiResponse.data;
+      responseData = apiResponse;
     } else {
       if (limit) {
         const query: Record<string, string | string[]> = {};
@@ -1210,7 +1253,7 @@ export class ExecuteNotionOperation
           query
         });
 
-        responseData = apiResponse.data?.splice(0, query.limit);
+        responseData = apiResponse.splice(0, query.limit);
       }
     }
 
@@ -1233,6 +1276,7 @@ export class ExecuteNotionOperation
       this.#auth.token,
       { archived: true },
     );
+
     let responseData: ApiResponseData | undefined;
     if (simple) {
       responseData = this.#simplifyObjects(apiResponse);
@@ -1312,8 +1356,8 @@ export class ExecuteNotionOperation
         body.sort = sort;
       }
 
-      let apiResponse: ApiResponse;
-      let responseData: ApiResponseData | undefined;
+      let apiResponse;
+      let responseData;
 
       if (returnAll) {
         apiResponse = await this.#api.apiRequestAllItems({
@@ -1323,10 +1367,15 @@ export class ExecuteNotionOperation
           data: body,
         });
 
-        responseData = apiResponse.data;
+        const flattenedResponseList: any = [];
+          apiResponse.forEach((p: any) => {
+            p.results.forEach((e: any) => flattenedResponseList.push(e))
+          })
+        
+        responseData = flattenedResponseList;
 
         if (simple) {
-          responseData = this.#simplifyObjects(apiResponse.data);
+          responseData = this.#simplifyObjects(responseData);
         }
       } else {
         if (limit) {
@@ -1338,11 +1387,16 @@ export class ExecuteNotionOperation
             authToken: this.#auth.token,
             query
           });
-  
-          responseData = apiResponse.data?.splice(0, query.limit);
+          
+          const flattenedResponseList: any = [];
+          apiResponse.forEach((p: any) => {
+            p.results.forEach((e: any) => flattenedResponseList.push(e))
+          })
+
+          responseData = flattenedResponseList.splice(0, query.limit);
 
           if (simple) {
-            responseData = this.#simplifyObjects(apiResponse.data);
+            responseData = this.#simplifyObjects(responseData);
           }
         }
       }
@@ -1352,7 +1406,9 @@ export class ExecuteNotionOperation
 
     // prettier-ignore
    #downloadFiles = async (records: FileRecord[]): Promise<Array<Record<string, unknown>>> => {
-  
+    if (!this.#auth) throw new Error('Auth missing');
+    if (!this.#api) throw new Error('Api missing');
+
     const elements: Array<Record<string, unknown>> = [];
     for (const record of records) {
       const element: any = { json: {}, binary: {} };
@@ -1367,10 +1423,10 @@ export class ExecuteNotionOperation
                 encoding: null
               }
               
-              await this.#api?.apiRequest(
+              await this.#api.apiRequest(
                 'GET',
                 '',
-                this.#auth?.token,
+                this.#auth.token,
                 body,
                 {}
               );
@@ -1466,12 +1522,16 @@ export class ExecuteNotionOperation
         return results;
       }
       
-      #getTextBlocks(block: Record<string, unknown>): Record<string, unknown> {
+      #getTextBlocks(block: Record<string, any>): Record<string, unknown> {
+        if (block.text.text && !Array.isArray(block.text.text)) {
+          block.text.text = [block.text.text]
+        }
+
         return {
           text:
             block.richText === false
               ? this.#formatText(block.textContent as string).text
-              : this.#getTexts(((block.text as Record<string, unknown>).text as TextData[]) || []),
+              : this.#getTexts((block.text.text as TextData[]) || []),
         };
       }
       
@@ -1606,9 +1666,6 @@ export class ExecuteNotionOperation
             };
             break;
           case 'date':
-            // const format = getDateFormat(value.includeTime);
-            // const timezoneValue =
-            // value.timezone === 'default' ? timezone : value.timezone;
               if (value.range === true) {
                 result = {
                   type: 'date',
@@ -1663,7 +1720,6 @@ export class ExecuteNotionOperation
       
       #mapProperties(
         properties: Array<Record<string, unknown>>,
-        // timezone: string,
         version = 1
       ): Record<string, unknown> {
         return properties
@@ -1680,7 +1736,6 @@ export class ExecuteNotionOperation
                 this.#getPropertyKeyValue(
                   property,
                   property.key.split('|')[1] as string,
-                  // timezone,
                   version
                 ),
               ] as const
