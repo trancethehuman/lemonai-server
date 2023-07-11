@@ -5,8 +5,10 @@ Partly borrowed from https://github.com/n8n-io/n8n.
 import githubParamDescriptions from '../../services/github-param-descriptions';
 import slackParamDescriptions from '../../services/slack-param-descriptions';
 import notionParamDescriptions from '../../services/notion-param-descriptions';
+import discordParamDescriptions from '../../services/discord-param-descriptions';
 
 export const toolTypes = [
+  'discord-message-send',
   'notion-append-after-block',
   'notion-get-child-blocks',
   'notion-get-database',
@@ -140,6 +142,7 @@ export type HubSpotAuthType = 'accessToken';
 export type SlackAuthType = 'accessToken';
 export type AirtableAuthType = 'accessToken';
 export type NotionAuthType = 'apiKey';
+export type DiscordAuthType = 'accessToken';
 export type HackerNewsAuthType = 'none';
 
 interface ToolBase {
@@ -151,7 +154,8 @@ interface ToolBase {
     | SlackAuthType
     | AirtableAuthType
     | HackerNewsAuthType
-    | NotionAuthType;
+    | NotionAuthType
+    | DiscordAuthType;
 }
 export interface Tool extends ToolBase {
   description: string;
@@ -661,6 +665,14 @@ const hubspotFormGetFieldsParams = {
 };
 
 const toolBases: ToolBase[] = [
+  {
+    name: 'Discord: Send message in channel',
+    id: 'discord-message-send',
+    params: {
+      ...discordParamDescriptions.messageSendParamDescriptions
+    },
+    authorizationType: 'accessToken'
+  },
   {
     name: 'Notion: Append after block',
     id: 'notion-append-after-block',

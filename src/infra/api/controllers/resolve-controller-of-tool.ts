@@ -38,6 +38,8 @@ import {
 import { type GithubApi } from '../../external/github-api';
 import { type ExecuteNotionOperationAuth, type ExecuteNotionOperationReq, type ExecuteNotionOperationRes } from '../../../domain/use-cases/execute-notion-operation';
 import { type NotionApi } from '../../external/notion-api';
+import { type ExecuteDiscordOperationAuth, type ExecuteDiscordOperationReq, type ExecuteDiscordOperationRes } from '../../../domain/use-cases/execute-discord-operation';
+import { type DiscordApi } from '../../external/discord-api';
 
 type Controller =
   | RunToolController<GetArticleHackerNewsReq, GetArticleHackerNewsRes>
@@ -70,7 +72,12 @@ type Controller =
       ExecuteNotionOperationReq,
       ExecuteNotionOperationRes,
       ExecuteNotionOperationAuth,
-      NotionApi>;
+      NotionApi>
+  | RunToolController<
+      ExecuteDiscordOperationReq,
+      ExecuteDiscordOperationRes,
+      ExecuteDiscordOperationAuth,
+      DiscordApi>;
 
 const buildAirtableAuth = (
   httpRequest: Request
@@ -103,7 +110,14 @@ const buildNotionAuth = (
 ): ExecuteNotionOperationAuth => ({
   token: httpRequest.body.authToken,
   type: httpRequest.body.authType,
-})
+});
+
+const buildDiscordAuth = (
+  httpRequest: Request
+): ExecuteDiscordOperationAuth => ({
+  token: httpRequest.body.authToken,
+  type: httpRequest.body.authType,
+});
 
 const getExecuteSlackOperationController = (
   buildReq: (httpRequest: Request) => ExecuteSlackOperationReq
@@ -164,6 +178,21 @@ const getExecuteGithubOperationController = (
       buildNotionAuth,
       app.resolve('notionApi')
     );
+
+  const getExecuteDiscordOperationController = (
+      buildReq: (httpRequest: Request) => ExecuteDiscordOperationReq
+    ): Controller =>
+      new RunToolController<
+        ExecuteDiscordOperationReq,
+        ExecuteDiscordOperationRes,
+        ExecuteDiscordOperationAuth,
+        DiscordApi
+      >(
+        buildReq,
+        app.resolve('executeDiscordOperation'),
+        buildDiscordAuth,
+        app.resolve('discordApi')
+      );
 
 const getExecuteAirtableOperationController = (
   buildReq: (httpRequest: Request) => ExecuteAirtableOperationReq
@@ -1609,6 +1638,20 @@ export default (toolId: string): Controller => {
       };
 
       return getExecuteNotionOperationController(buildReq);
+    }
+
+    case 'discord-message-send': {
+      const buildReq = (httpReq: Request): ExecuteDiscordOperationReq => {
+
+        return {
+          params: {
+            toolType,
+            messageSendParamTypes: httpReq.body,
+          },
+        };
+      };
+
+      return getExecuteDiscordOperationController(buildReq);
     }
 
     default:
