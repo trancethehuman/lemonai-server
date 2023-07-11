@@ -18,10 +18,18 @@ npm install
 
 This will install the corresponding node modules.
 
-To start the server run:
+To start the server:
+
+On Mac/Linux:
 
 ```bash
 npm start
+```
+
+On Windows:
+
+```bash
+npm run start-win
 ```
 
 The terminal should indicate that the server is running:
