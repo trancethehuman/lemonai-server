@@ -9,9 +9,9 @@
     "tsc": "tsc",
     "clean": "rimraf dist",
     "build": "npm run clean && npm run tsc && npm run lint",
-    "start": "npm run build &&export NODE_ENV=production&&nodemon ./src/index.ts",
-    "dev": "npm run build &&export NODE_ENV=development&&nodemon ./src/index.ts",
-    "debug": "npm run build&&export NODE_ENV=development&&nodemon --inspect ./src/index.ts 1313"
+    "start": "npm run build && (export NODE_ENV=production || set NODE_ENV=production) && nodemon ./src/index.ts",
+    "dev": "npm run build && (export NODE_ENV=production || set NODE_ENV=production) && nodemon ./src/index.ts",
+    "debug": "npm run build && (export NODE_ENV=production || set NODE_ENV=production) && nodemon --inspect ./src/index.ts 1313"
   },
   "repository": {
     "type": "git",
